@@ -25,13 +25,13 @@ app.get('/api/weather', async (req, res) => {
     try {
         // 1. Get coordinates for the city using Geocoding API
         const geoResponse = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
-        
+
         if (!geoResponse.data.results || geoResponse.data.results.length === 0) {
             return res.status(404).json({ error: 'City not found' });
         }
 
         const location = geoResponse.data.results[0];
-        
+
         // 2. Get 7-day weather forecast
         // We will fetch Max Temperature, Rainfall (precipitation_sum), and Windspeed (windspeed_10m_max)
         const weatherResponse = await axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&daily=temperature_2m_max,precipitation_sum,wind_speed_10m_max&timezone=auto`);
@@ -54,7 +54,7 @@ const frontendPath = path.join(__dirname, 'frontend', 'dist');
 app.use(express.static(frontendPath));
 
 // Fallback to index.html for React Router / SPA application
-app.get('*', (req, res) => {
+app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
